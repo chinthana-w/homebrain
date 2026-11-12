@@ -1,0 +1,52 @@
+services:
+  homebrain:
+    image: python:3.12-slim
+    working_dir: /app
+    command: python -m homebrain.server
+    volumes:
+      - ./:/app
+    ports:
+      - "8787:8787"
+    environment:
+      HOMEBRAIN_HOST: 0.0.0.0
+      HOMEBRAIN_PORT: 8787
+      # Optionally lock down API POST calls from third-party AI clients.
+      # HOMEBRAIN_API_TOKEN: change-me
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    ports:
+      - "8096:8096"
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+    restart: unless-stopped
+
+  pihole:
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8081:80"
+    environment:
+      TZ: UTC
+    volumes:
+      - pihole-config:/etc/pihole
+      - dnsmasq-config:/etc/dnsmasq.d
+    restart: unless-stopped
+
+volumes:
+  ollama:
+  jellyfin-config:
+  jellyfin-cache:
+  pihole-config:
+  dnsmasq-config:
