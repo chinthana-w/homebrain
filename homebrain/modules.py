@@ -11,8 +11,8 @@ DEFAULT_MODULES: list[dict[str, Any]] = [
         "id": "llm",
         "name": "Local LLM",
         "kind": "ai",
-        "endpoint": "http://ollama:11434",
-        "description": "Small on-device LLM runtime (model configurable).",
+        "endpoint": "http://llama-cpp:8080/v1",
+        "description": "Local GGUF inference server with an OpenAI-compatible API.",
     },
     {
         "id": "jellyfin",

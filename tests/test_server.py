@@ -25,6 +25,7 @@ class BridgeTests(unittest.TestCase):
         response = build_bridge_response(payload, DEFAULT_MODULES)
         self.assertEqual(response["status"], "accepted")
         self.assertEqual(response["target"], "llm")
+        self.assertEqual(response["target_endpoint"], "http://llama-cpp:8080/v1")
 
     def test_unknown_target_rejected(self) -> None:
         payload = {"target": "missing", "message": "hi"}

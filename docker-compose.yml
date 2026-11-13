@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   homebrain:
     image: python:3.12-slim
@@ -14,21 +16,28 @@ services:
       # HOMEBRAIN_API_TOKEN: change-me
     restart: unless-stopped
 
-  ollama:
-    image: ollama/ollama:latest
+  llama-cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: ["-m", "/models/model.gguf", "--alias", "homebrain-coder", "--ctx-size", "8192", "--host", "0.0.0.0", "--port", "8080"]
     ports:
-      - "11434:11434"
+      - "8080:8080"
     volumes:
-      - ollama:/root/.ollama
+      - ./models:/models:ro
     restart: unless-stopped
 
   jellyfin:
     image: jellyfin/jellyfin:latest
+    container_name: jellyfin
     ports:
-      - "8096:8096"
+
+      - "8096:8096"  # Web interface
+      - "3344:3344"  # Streaming port
     volumes:
-      - jellyfin-config:/config
-      - jellyfin-cache:/cache
+
+
+      - ~/Movies:/movies  # macOS Movies folder
+      - ~/Music:/music    # macOS Music folder
+      - ~/TV\ Shows:/tvshows  # macOS TV Shows folder (note: backslash escape for space)
     restart: unless-stopped
 
   pihole:
@@ -45,8 +54,12 @@ services:
     restart: unless-stopped
 
 volumes:
-  ollama:
   jellyfin-config:
   jellyfin-cache:
   pihole-config:
   dnsmasq-config:
+
+
+
+
+
