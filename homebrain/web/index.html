@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#101812">
+    <meta name="description" content="Your private, local-first home intelligence dashboard.">
+    <title>Homebrain — Home intelligence</title>
+    <link rel="stylesheet" href="/static/app.css">
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#dashboard" aria-label="Homebrain dashboard">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="brand-name">homebrain<span class="brand-period">.</span></span>
+        </a>
+        <p class="nav-caption">WORKSPACE</p>
+        <nav class="primary-nav">
+          <button class="nav-link active" data-page="dashboard" type="button"><span class="nav-icon">◫</span><span>Overview</span></button>
+          <button class="nav-link" data-page="chat" type="button"><span class="nav-icon">✳</span><span>Assistant</span><span class="nav-badge">AI</span></button>
+          <button class="nav-link" data-page="sources" type="button"><span class="nav-icon">⌘</span><span>Data sources</span><span class="nav-count" id="nav-source-count">0</span></button>
+          <button class="nav-link" data-page="activity" type="button"><span class="nav-icon">↗</span><span>Activity</span></button>
+          <button class="nav-link" data-page="settings" type="button"><span class="nav-icon">⚙</span><span>Settings</span></button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="privacy-card">
+            <span class="privacy-indicator"></span>
+            <div><strong>Private by design</strong><small>Runs on your network</small></div>
+          </div>
+          <div class="sidebar-model"><span class="model-dot"></span><span><strong>Local model</strong><small>Qwen3 · llama.cpp</small></span></div>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Homebrain</span><span class="crumb-slash">/</span><strong id="page-title">Overview</strong></div>
+          <div class="topbar-right">
+            <div class="system-status"><span class="status-dot" id="system-dot"></span><span id="system-status">Connecting</span></div>
+            <button class="avatar-button" type="button" aria-label="Local home workspace">H</button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="page-view" id="page-dashboard" aria-labelledby="welcome-title">
+            <div class="welcome-row">
+              <div>
+                <p class="eyebrow"><span class="eyebrow-line"></span>YOUR HOME, IN FOCUS</p>
+                <h1 id="welcome-title">A little more <span>in sync.</span></h1>
+                <p class="welcome-copy">A calm view of what’s happening across your home.</p>
+              </div>
+              <div class="welcome-actions">
+                <span class="last-updated" id="last-updated">Waiting for first analysis</span>
+                <button class="button button-primary" id="run-analysis" type="button"><span class="button-spark">✳</span> Analyze now</button>
+              </div>
+            </div>
+
+            <div class="insight-banner" id="headline-card">
+              <div class="banner-symbol">✳</div>
+              <div class="banner-copy"><span class="banner-label">HOME SUMMARY</span><p id="dashboard-headline">Connect a data source to begin seeing the bigger picture.</p></div>
+              <span class="banner-status" id="analysis-status">READY</span>
+            </div>
+
+            <div class="section-heading">
+              <div><p class="eyebrow">AT A GLANCE</p><h2>Signals</h2></div>
+              <button class="text-button" type="button" data-page="sources">Manage sources <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="metrics-grid" id="metrics-grid">
+              <article class="metric-card empty-metric"><span class="metric-icon">✳</span><p>Dashboard insights will appear here after your first analysis.</p></article>
+            </div>
+
+            <div class="dashboard-lower">
+              <section class="panel insights-panel">
+                <div class="panel-heading"><div><p class="eyebrow">WHAT MATTERS</p><h2>Latest insights</h2></div><span class="panel-icon">✧</span></div>
+                <div class="insight-list" id="insight-list"><div class="empty-state compact-empty"><span>✧</span><p>Your findings will show up here.</p></div></div>
+              </section>
+              <section class="panel sources-panel">
+                <div class="panel-heading"><div><p class="eyebrow">CONNECTED INPUTS</p><h2>Data sources</h2></div><button class="icon-button" data-page="sources" type="button" aria-label="Add data source">+</button></div>
+                <div class="mini-source-list" id="dashboard-sources"><div class="empty-state compact-empty"><span>⌘</span><p>No sources connected yet.</p></div></div>
+                <button class="button button-secondary full-button" type="button" data-page="sources">Explore your sources <span aria-hidden="true">→</span></button>
+              </section>
+            </div>
+          </section>
+
+          <section class="page-view hidden" id="page-chat" aria-labelledby="chat-title">
+            <div class="subpage-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR PRIVATE ASSISTANT</p><h1 id="chat-title">Think out loud.</h1><p class="welcome-copy">Ask about your home or get a hand thinking something through.</p></div>
+              <div class="model-pill"><span class="model-dot"></span>Qwen3 4B <span class="pill-divider"></span>On device</div>
+            </div>
+            <div class="chat-layout">
+              <div class="chat-panel panel">
+                <div class="chat-topline"><span class="chat-live-dot"></span><span>Private conversation</span><button class="text-button" id="clear-chat" type="button">New conversation</button></div>
+                <div class="chat-messages" id="chat-messages" aria-live="polite">
+                  <div class="assistant-message message-row"><div class="message-avatar">✳</div><div class="message-bubble"><span class="message-author">Homebrain</span><p>Hi there. I’m your local assistant. Ask me anything, or ask about the latest signals from your connected sources.</p></div></div>
+                </div>
+                <form class="chat-composer" id="chat-form">
+                  <label class="sr-only" for="chat-input">Message Homebrain</label>
+                  <textarea id="chat-input" rows="1" maxlength="6000" placeholder="Ask Homebrain anything…" required></textarea>
+                  <div class="composer-footer"><span>Enter to send <span class="composer-dot">·</span> Shift + Enter for a new line</span><button class="send-button" id="send-chat" type="submit" aria-label="Send message"><span>↑</span></button></div>
+                </form>
+              </div>
+              <aside class="chat-aside">
+                <div class="panel prompt-panel"><p class="eyebrow">A FEW IDEAS</p><h3>Start with a question</h3><button class="suggestion" data-prompt="What should I know about my home today?" type="button">What should I know about my home today?<span>→</span></button><button class="suggestion" data-prompt="Help me make sense of the latest dashboard insights." type="button">Make sense of my latest insights<span>→</span></button><button class="suggestion" data-prompt="What are some useful data sources I could connect?" type="button">What data could I connect?<span>→</span></button></div>
+                <div class="local-note"><span class="note-lock">⌑</span><div><strong>Your conversations stay local</strong><p>Messages are sent only to your Homebrain model running on this network.</p></div></div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="page-view hidden" id="page-sources" aria-labelledby="sources-title">
+            <div class="subpage-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR HOME, CONNECTED</p><h1 id="sources-title">Bring your signals together.</h1><p class="welcome-copy">Connect weather, traffic, market quotes, local news, nearby events, notes, URLs, Gmail metadata, and GitHub activity. Homebrain checks enabled sources on a schedule and has the local model analyze their snapshots.</p></div>
+            </div>
+            <div class="sources-layout">
+              <section class="panel add-source-panel">
+                <div class="panel-heading"><div><p class="eyebrow">NEW CONNECTION</p><h2>Add a data source</h2></div><span class="panel-icon">＋</span></div>
+                <form id="source-form" class="source-form">
+                  <label class="field-label" for="source-name">Name</label>
+                  <input id="source-name" name="name" maxlength="100" placeholder="e.g. Morning notes" required>
+                  <label class="field-label" for="source-type">Source type</label>
+                  <select id="source-type" name="type"><option value="text">Text note</option><option value="url">Web URL (read-only)</option><option value="gmail">Gmail inbox metadata (read-only)</option><option value="github">GitHub repositories (read-only)</option><option value="traffic">Live traffic</option><option value="stocks">Stock market quotes</option><option value="news">Local news headlines</option><option value="events">Nearby events</option></select>
+                  <label class="field-label" id="source-value-label" for="source-value">Your note</label>
+                  <textarea id="source-value" name="value" maxlength="6000" rows="5" placeholder="Anything you’d like Homebrain to keep an eye on…" required></textarea>
+                  <p class="field-hint" id="source-hint">Add a note or observation. You can update or remove it any time.</p>
+                  <button class="button button-primary full-button" id="add-source" type="submit">Add source <span aria-hidden="true">→</span></button>
+                  <p class="form-error" id="source-error" role="alert"></p>
+                </form>
+              </section>
+              <section class="panel connected-panel">
+                <div class="panel-heading"><div><p class="eyebrow">YOUR INPUTS</p><h2>Connected sources <span class="heading-count" id="source-count">0</span></h2></div></div>
+                <div class="source-list" id="source-list"><div class="empty-state"><span>⌘</span><h3>A clearer picture starts here.</h3><p>Add a note or connect a read-only text feed to get started.</p></div></div>
+                <div class="schedule-note"><span class="schedule-icon">◷</span><div><strong>Automatic analysis</strong><p id="schedule-copy">Your enabled sources are checked every hour. Run an analysis any time.</p></div><button class="text-button" id="run-analysis-secondary" type="button">Run now</button></div>
+              </section>
+            </div>
+            <p class="source-footnote">Traffic samples one road segment near the configured home point. Market quotes may be delayed and are not financial advice; news headlines are unverified; event availability can change. TomTom, Finnhub, and Ticketmaster API keys are optional and stay in your local environment; Google News RSS and Open-Meteo weather require no key. Gmail reads only sender, subject, date, and labels from the 20 most recent inbox messages; it never fetches message bodies. GitHub reads issue, pull-request, and release metadata for up to five selected repositories; it does not fetch source code or make changes. URLs use GET only and do not send authorization headers. Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> (CC BY 4.0).</p>
+          </section>
+
+          <section class="page-view hidden" id="page-activity" aria-labelledby="activity-title">
+            <div class="subpage-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>THE LATEST</p><h1 id="activity-title">A little history.</h1><p class="welcome-copy">See when your sources were checked and what changed.</p></div>
+              <button class="button button-primary" id="run-analysis-activity" type="button"><span class="button-spark">✳</span> Analyze now</button>
+            </div>
+            <div class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">ANALYSIS LOG</p><h2>Recent runs</h2></div><span class="panel-icon">↗</span></div><div class="activity-list" id="activity-list"><div class="empty-state"><span>◷</span><h3>Your activity will appear here.</h3><p>Once Homebrain checks a source, you’ll find a record of it here.</p></div></div></div>
+          </section>
+
+          <section class="page-view hidden" id="page-settings" aria-labelledby="settings-title">
+            <div class="subpage-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR WORKSPACE</p><h1 id="settings-title">A few preferences.</h1><p class="welcome-copy">Keep this dashboard comfortable and private on your network.</p></div>
+            </div>
+            <section class="panel settings-panel">
+              <div class="panel-heading"><div><p class="eyebrow">CONNECTION</p><h2>API access token</h2></div><span class="panel-icon">⌑</span></div>
+              <p class="settings-description">If you set <code>HOMEBRAIN_API_TOKEN</code> on the Homebrain service, enter the same token here so chat, source changes, and manual analysis remain available. It is stored only in this browser.</p>
+              <form id="token-form" class="token-form">
+                <label class="field-label" for="api-token">Homebrain API token</label>
+                <div class="token-entry"><input id="api-token" type="password" autocomplete="off" placeholder="Leave blank if API protection is not enabled"><button class="button button-primary" type="submit">Save token</button></div>
+                <button class="text-button clear-token" id="clear-token" type="button">Clear saved token</button>
+              </form>
+              <p class="token-feedback" id="token-feedback" role="status"></p>
+            </section>
+          </section>
+
+          <footer class="page-footer"><span>Made for a more thoughtful home.</span><span><span class="footer-dot"></span> Your data stays yours</span></footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

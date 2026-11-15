@@ -7,11 +7,28 @@ services:
     command: python -m homebrain.server
     volumes:
       - ./:/app
+      - ./data:/data
     ports:
       - "8787:8787"
     environment:
       HOMEBRAIN_HOST: 0.0.0.0
       HOMEBRAIN_PORT: 8787
+      HOMEBRAIN_DB_PATH: /data/homebrain.sqlite3
+      HOMEBRAIN_LLM_API_BASE: http://llama-cpp:8080/v1
+      HOMEBRAIN_LLM_MODEL: homebrain-coder
+      HOMEBRAIN_ANALYSIS_INTERVAL_SECONDS: 900
+      HOMEBRAIN_WEATHER_LOCATION: Austin, TX
+      HOMEBRAIN_WEATHER_LATITUDE: 30.2672
+      HOMEBRAIN_WEATHER_LONGITUDE: -97.7431
+      HOMEBRAIN_WEATHER_TIMEZONE: America/Chicago
+      HOMEBRAIN_TRAFFIC_API_KEY: ${HOMEBRAIN_TRAFFIC_API_KEY:-}
+      HOMEBRAIN_STOCKS_API_KEY: ${HOMEBRAIN_STOCKS_API_KEY:-}
+      HOMEBRAIN_STOCK_SYMBOLS: ${HOMEBRAIN_STOCK_SYMBOLS:-SPY,QQQ,DIA}
+      HOMEBRAIN_TICKETMASTER_API_KEY: ${HOMEBRAIN_TICKETMASTER_API_KEY:-}
+      HOMEBRAIN_GMAIL_CLIENT_ID: ${HOMEBRAIN_GMAIL_CLIENT_ID:-}
+      HOMEBRAIN_GMAIL_CLIENT_SECRET: ${HOMEBRAIN_GMAIL_CLIENT_SECRET:-}
+      HOMEBRAIN_GMAIL_REFRESH_TOKEN: ${HOMEBRAIN_GMAIL_REFRESH_TOKEN:-}
+      HOMEBRAIN_GITHUB_TOKEN: ${HOMEBRAIN_GITHUB_TOKEN:-}
       # Optionally lock down API POST calls from third-party AI clients.
       # HOMEBRAIN_API_TOKEN: change-me
     restart: unless-stopped
@@ -29,12 +46,9 @@ services:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     ports:
-
       - "8096:8096"  # Web interface
       - "3344:3344"  # Streaming port
     volumes:
-
-
       - ~/Movies:/movies  # macOS Movies folder
       - ~/Music:/music    # macOS Music folder
       - ~/TV\ Shows:/tvshows  # macOS TV Shows folder (note: backslash escape for space)
@@ -58,8 +72,4 @@ volumes:
   jellyfin-cache:
   pihole-config:
   dnsmasq-config:
-
-
-
-
 
