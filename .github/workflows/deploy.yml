@@ -1,0 +1,98 @@
+# DRAFT ONLY — do not copy into the repo until reviewed
+# Homebrain auto-deployment — GitHub Actions, push to main
+#
+# Primary path (recommended): self-hosted runner on the Mac.
+#   No SSH keys stored in GitHub, no inbound port, no public exposure.
+#   The Mac itself pulls and restarts its own stack when main changes.
+#
+# Alternative path (commented out below): SSH over Tailscale from a
+#   GitHub-hosted runner. Only use this if you do NOT want a runner
+#   on the Mac. Do not enable both jobs.
+#
+# Missing inputs — fill these in before use:
+#   <RUNNER_LABELS>        labels of the self-hosted runner on the Mac
+#   Checkout path is known: ~/projects/homebrain
+#   Tailscale is set up on the Mac — device name chinthanas-macbook-pro
+#   (SSH path only) <MAC_TAILSCALE_HOST>, <MAC_SSH_USER> — see commented job
+
+name: Deploy Homebrain to Mac
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: homebrain-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy on Mac (self-hosted runner)
+    runs-on: [self-hosted, <RUNNER_LABELS>]
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ~/projects/homebrain
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: bash scripts/deploy.sh
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://localhost:8787/api/v1/health; then
+              echo "Homebrain is healthy."
+              exit 0
+            fi
+            echo "Waiting for Homebrain (attempt $i/30)..."
+            sleep 4
+          done
+          echo "::error::Homebrain did not become healthy on port 8787."
+          docker compose ps || true
+          docker compose logs --tail=100 homebrain || true
+          exit 1
+
+  # ------------------------------------------------------------------
+  # ALTERNATIVE — SSH over Tailscale (disabled; do not enable both)
+  # ------------------------------------------------------------------
+  # How it works: a GitHub-hosted runner reaches the Mac only over
+  # the private Tailscale network (100.x address or MagicDNS name),
+  # never over the public internet. Requires these GitHub secrets:
+  #   MAC_TAILSCALE_HOST — Mac's Tailscale address, chinthanas-macbook-pro (or its 100.x address)
+  #   MAC_SSH_USER       — macOS username on the Mac
+  #   MAC_SSH_KEY        — private SSH key for that user (no passphrase
+  #                        stored in plaintext; add as a GitHub secret)
+  #   MAC_CHECKOUT_PATH  — known: ~/projects/homebrain
+  # Also requires: Remote Login (SSH) enabled on the Mac, Tailscale
+  # installed and logged in on the Mac (set up as chinthanas-macbook-pro), and the repo already cloned
+  # at ~/projects/homebrain with the deploy script present.
+  #
+  # deploy-ssh:
+  #   name: Deploy on Mac (SSH over Tailscale)
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 15
+  #   steps:
+  #     - name: Deploy over SSH
+  #       uses: appleboy/ssh-action@v1
+  #       with:
+  #         host: ${{ secrets.MAC_TAILSCALE_HOST }}
+  #         username: ${{ secrets.MAC_SSH_USER }}
+  #         key: ${{ secrets.MAC_SSH_KEY }}
+  #         port: 22
+  #         script: |
+  #           cd ~/projects/homebrain
+  #           bash scripts/deploy.sh
+  #     - name: Health check over Tailscale
+  #       run: |
+  #         # This step only works if the GitHub runner can reach the
+  #         # tailnet. A stock ubuntu-latest runner cannot join
+  #         # Tailscale on its own; run the health check from the Mac
+  #         # inside deploy.sh instead (it already does), or run this
+  #         # check from a machine on the tailnet.
+  #         echo "Health check is done on the Mac inside scripts/deploy.sh."
