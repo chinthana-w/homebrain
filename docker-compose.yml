@@ -30,7 +30,7 @@ services:
       HOMEBRAIN_GMAIL_REFRESH_TOKEN: ${HOMEBRAIN_GMAIL_REFRESH_TOKEN:-}
       HOMEBRAIN_GITHUB_TOKEN: ${HOMEBRAIN_GITHUB_TOKEN:-}
       # Optionally lock down API POST calls from third-party AI clients.
-      # HOMEBRAIN_API_TOKEN: change-me
+      HOMEBRAIN_API_TOKEN: ${HOMEBRAIN_API_TOKEN:-}
     restart: unless-stopped
 
   llama-cpp:

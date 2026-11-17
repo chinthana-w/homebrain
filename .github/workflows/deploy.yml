@@ -31,7 +31,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy on Mac (self-hosted runner)
-    runs-on: [self-hosted, <RUNNER_LABELS>]
+    runs-on: ['self-hosted', 'macOS', 'ARM64']
     timeout-minutes: 15
     defaults:
       run:
