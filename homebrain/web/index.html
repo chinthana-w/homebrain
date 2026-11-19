@@ -21,6 +21,7 @@
           <button class="nav-link active" data-page="dashboard" type="button"><span class="nav-icon">◫</span><span>Overview</span></button>
           <button class="nav-link" data-page="chat" type="button"><span class="nav-icon">✳</span><span>Assistant</span><span class="nav-badge">AI</span></button>
           <button class="nav-link" data-page="sources" type="button"><span class="nav-icon">⌘</span><span>Data sources</span><span class="nav-count" id="nav-source-count">0</span></button>
+          <button class="nav-link" data-page="modules" type="button"><span class="nav-icon">▦</span><span>Modules</span></button>
           <button class="nav-link" data-page="activity" type="button"><span class="nav-icon">↗</span><span>Activity</span></button>
           <button class="nav-link" data-page="settings" type="button"><span class="nav-icon">⚙</span><span>Settings</span></button>
         </nav>
@@ -141,6 +142,15 @@
               <button class="button button-primary" id="run-analysis-activity" type="button"><span class="button-spark">✳</span> Analyze now</button>
             </div>
             <div class="panel activity-panel"><div class="panel-heading"><div><p class="eyebrow">ANALYSIS LOG</p><h2>Recent runs</h2></div><span class="panel-icon">↗</span></div><div class="activity-list" id="activity-list"><div class="empty-state"><span>◷</span><h3>Your activity will appear here.</h3><p>Once Homebrain checks a source, you’ll find a record of it here.</p></div></div></div>
+          </section>
+
+          <section class="page-view hidden" id="page-modules" aria-labelledby="modules-title">
+            <div class="subpage-heading">
+              <div><p class="eyebrow"><span class="eyebrow-line"></span>YOUR HOME, EXTENDED</p><h1 id="modules-title">Everything connected.</h1><p class="welcome-copy">Open a Homebrain service in a new tab. Links use this device’s current host name so they work on the Mac and across your LAN.</p></div>
+            </div>
+            <div class="modules-grid" id="module-list" aria-live="polite">
+              <div class="empty-state"><span>▦</span><h3>Loading modules…</h3></div>
+            </div>
           </section>
 
           <section class="page-view hidden" id="page-settings" aria-labelledby="settings-title">

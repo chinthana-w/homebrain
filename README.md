@@ -4,7 +4,7 @@ Homebrain is a LAN-first smart-home server entrypoint designed to run on a MacBo
 
 ## What this repository provides
 
-- A responsive web dashboard with Overview, Assistant, Data sources, and Activity sections.
+- A responsive web dashboard with Overview, Assistant, Data sources, Modules, and Activity sections.
 - A private chat UI powered by the local llama.cpp model.
 - A scheduled analysis agent that fetches enabled data sources, sends bounded snapshots to the local model, and updates a persistent dashboard.
 - Optional read-only connectors for Gmail inbox metadata and selected GitHub repository activity.
@@ -34,6 +34,7 @@ Exposed ports:
 - `8096` Jellyfin
 - `8081` Pi-hole admin UI (`/admin`)
 - `53/tcp` and `53/udp` Pi-hole DNS
+- `80` LAN-only Homebrain reverse proxy (`homebrain.home.arpa`)
 
 Open `http://<your-macbook-lan-ip>:8787` to use the dashboard. Built-in weather,
 traffic, market, news, and event sources are seeded on first start. Add a text
@@ -41,6 +42,30 @@ note, read-only HTTP(S) endpoint, or configure the Gmail/GitHub connectors below
 **Data sources**. The agent analyzes enabled
 sources every 15 minutes by default; **Analyze now** starts an on-demand run. Its latest
 summary and insights persist across restarts in `./data/homebrain.sqlite3`.
+
+### Open Homebrain and its modules by name
+
+The Compose stack includes a Caddy reverse proxy for the private LAN hostname
+`http://homebrain.home.arpa/`. To make that name resolve on your network:
+
+1. Reserve the Mac's LAN address in your router's DHCP settings. The record must
+   point to the Mac's current LAN IP, not its Tailscale address.
+2. In Pi-hole, open **Local DNS → DNS Records** and add
+   `homebrain.home.arpa` with the Mac's reserved LAN IP.
+3. Configure the router's DHCP DNS setting to hand out Pi-hole's LAN IP, then
+   reconnect clients or renew their DHCP leases. Clients using another DNS
+   resolver will not resolve this private name.
+4. Start or update the stack with `docker compose up -d`, then open
+   `http://homebrain.home.arpa/`.
+
+The proxy serves Homebrain over HTTP on the LAN; it does not configure a public
+domain or HTTPS. Do not forward ports 80, 53, or 8081 from the internet. A
+registered public domain needs a domain name and a separately secured remote
+access design; do not point a public DNS record directly at this Mac.
+
+The dashboard's **Modules** page links to each configured service. Jellyfin,
+Pi-hole, and the llama.cpp API still use their separately exposed ports; the
+LLM link opens its OpenAI-compatible models endpoint.
 
 The local model serves chat on `http://localhost:8080/v1`. Chat and analysis
 requests are sent to the local llama.cpp service, not a hosted AI API. Configure

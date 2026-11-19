@@ -1,0 +1,3 @@
+http://homebrain.home.arpa {
+	reverse_proxy homebrain:8787
+}

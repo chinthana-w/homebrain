@@ -1,8 +1,9 @@
-const pages = ["dashboard", "chat", "sources", "activity", "settings"];
+const pages = ["dashboard", "chat", "sources", "modules", "activity", "settings"];
 const pageTitles = {
   dashboard: "Overview",
   chat: "Assistant",
   sources: "Data sources",
+  modules: "Modules",
   activity: "Activity",
   settings: "Settings",
 };
@@ -71,7 +72,51 @@ function navigate(page, updateHash = true) {
   byId("page-title").textContent = pageTitles[page];
   if (updateHash && location.hash !== `#${page}`) history.replaceState(null, "", `#${page}`);
   if (page === "sources") loadSources();
+  if (page === "modules") loadModules();
   if (page === "activity") loadActivity();
+}
+
+function renderModules(modules) {
+  const list = byId("module-list");
+  list.replaceChildren();
+  if (!modules.length) {
+    const empty = make("div", "empty-state");
+    empty.append(make("span", "", "▦"), make("h3", "", "No modules are configured."));
+    list.append(empty);
+    return;
+  }
+  modules.forEach((module) => {
+    const card = make("article", "panel module-card");
+    const heading = make("div", "module-card-heading");
+    const icon = make("span", "module-icon", module.kind === "ai" ? "✳" : module.kind === "media" ? "▻" : "⌘");
+    const name = make("div");
+    name.append(make("p", "eyebrow", module.kind.toUpperCase()), make("h2", "", module.name));
+    heading.append(icon, name);
+    card.append(heading, make("p", "module-description", module.description));
+
+    const endpoint = new URL(module.public_path || "/", window.location.origin);
+    if (module.public_port) endpoint.port = String(module.public_port);
+    const link = make("a", "button button-secondary module-link", "Open module");
+    link.href = endpoint.href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.append(make("span", "", " ↗"));
+    card.append(link);
+    list.append(card);
+  });
+}
+
+async function loadModules() {
+  const list = byId("module-list");
+  try {
+    const data = await api("/api/v1/modules");
+    renderModules(data.modules || []);
+  } catch (error) {
+    list.replaceChildren();
+    const message = make("div", "empty-state");
+    message.append(make("span", "", "!"), make("h3", "", "Modules couldn’t load."), make("p", "", error.message));
+    list.append(message);
+  }
 }
 
 function dateLabel(value) {

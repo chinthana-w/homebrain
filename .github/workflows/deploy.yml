@@ -11,7 +11,7 @@
 #
 # Missing inputs — fill these in before use:
 #   <RUNNER_LABELS>        labels of the self-hosted runner on the Mac
-#   Checkout path is known: ~/projects/homebrain
+#   Persistent Homebrain checkout: $HOME/projects/homebrain
 #   Tailscale is set up on the Mac — device name chinthanas-macbook-pro
 #   (SSH path only) <MAC_TAILSCALE_HOST>, <MAC_SSH_USER> — see commented job
 
@@ -33,15 +33,12 @@ jobs:
     name: Deploy on Mac (self-hosted runner)
     runs-on: ['self-hosted', 'macOS', 'ARM64']
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: ~/projects/homebrain
     steps:
       - name: Check out main
         uses: actions/checkout@v4
 
       - name: Deploy
-        run: bash scripts/deploy.sh
+        run: bash scripts/deploy.sh "$HOME/projects/homebrain"
 
       - name: Health check
         run: |

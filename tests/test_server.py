@@ -32,6 +32,29 @@ class LoadModulesTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             load_modules()
 
+    def test_module_public_links_are_defined_and_custom_ports_are_validated(self) -> None:
+        modules = load_modules()
+        public_links = {module["id"]: (module["public_port"], module["public_path"]) for module in modules}
+        self.assertEqual(public_links["jellyfin"], (8096, "/web/"))
+        self.assertEqual(public_links["pihole"], (8081, "/admin/"))
+        self.assertEqual(public_links["llm"], (8080, "/v1/models"))
+        for item in (
+            {
+                "id": "bad-port",
+                "endpoint": "http://service:1234",
+                "public_port": 70000,
+            },
+            {
+                "id": "bad-path",
+                "endpoint": "http://service:1234",
+                "public_path": "//attacker.example",
+            },
+        ):
+            with self.subTest(item=item), patch.dict(
+                os.environ, {"HOMEBRAIN_MODULES_JSON": json.dumps([item])}
+            ), self.assertRaises(ValueError):
+                load_modules()
+
 
 class BridgeTests(unittest.TestCase):
     def test_valid_request(self) -> None:
@@ -105,6 +128,8 @@ class HTTPAPITests(unittest.TestCase):
         self.assertIn('id="page-sources"', page)
         self.assertIn('id="page-activity"', page)
         self.assertIn('id="page-settings"', page)
+        self.assertIn('id="page-modules"', page)
+        self.assertIn('data-page="modules"', page)
         self.assertIn('<option value="gmail">', page)
         self.assertIn('<option value="github">', page)
         for source_type in ("traffic", "stocks", "news", "events"):
@@ -112,6 +137,16 @@ class HTTPAPITests(unittest.TestCase):
         css_status, css = self.request("GET", "/static/app.css")
         self.assertEqual(css_status, 200)
         self.assertIn("@media (max-width: 600px)", css)
+
+    def test_modules_api_includes_browser_accessible_service_ports(self) -> None:
+        status, response = self.request("GET", "/api/v1/modules")
+        self.assertEqual(status, 200)
+        links = {
+            module["id"]: (module["public_port"], module["public_path"])
+            for module in response["modules"]
+        }
+        self.assertEqual(links["jellyfin"], (8096, "/web/"))
+        self.assertEqual(links["pihole"], (8081, "/admin/"))
 
     def test_chat_api_forwards_chat_to_local_model(self) -> None:
         messages = [{"role": "user", "content": "Hello"}]
